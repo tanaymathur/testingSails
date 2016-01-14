@@ -1,0 +1,15 @@
+<h1>User Sign Up	</h1>
+<form action="/user/create" method="POST" class="form-signin" id="myForm">  
+    <h2> Create an account</h2>
+    <input type="text" placeholder="name" name="name"><br> 
+    <input type="text" placeholder="email" name="email"><br>
+    <input type="text" placeholder="title" name="title"><br>
+    <input type="password" placeholder="password" name="password"><br>
+	<input id="subbut" type="submit" value="Create Account"/><br>
+    <input  type="hidden" name="_csrf" value="<%=_csrf%>" />
+</form>
+// <script>
+// document.getElementById('subbut').addEventListener('click', function(){
+//     if (validate()) document.getElementById('myForm').submit();
+// });
+</script>
