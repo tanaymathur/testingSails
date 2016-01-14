@@ -1,5 +1,6 @@
 var passport = require('passport'),
-  FacebookStrategy = require('passport-facebook').Strategy;
+  FacebookStrategy = require('passport-facebook').Strategy,
+  GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
 function findById(id, fn) {
   User.findOne(id,function (err, user) {
@@ -12,7 +13,6 @@ function findById(id, fn) {
 }
 
 function findByFacebookId(id, fn) {
-
   User.findOne({
     facebookId: id
   },function (err, user) {
@@ -24,6 +24,20 @@ function findByFacebookId(id, fn) {
     }
   });
 }
+function findByGoogleId(id, fn) {
+  console.log("Id:",id);
+  User.findOne({
+    googleId: id
+  },function (err, user) {
+    if (err) {console.log("Error:",err);
+      return fn(null, null);
+    } else {
+      //console.log("\nid:",id,"##",user);
+      return fn(null, user);
+    }
+  });
+}
+
 
 passport.serializeUser(function (user, done) {
   done(null, user.id);
@@ -55,6 +69,46 @@ passport.use(new FacebookStrategy({
           // as long as it is in your model
 
         },function (err, user) {
+          if (user) {
+            return done(null, user, {
+              message: 'Logged In Successfully'
+            });
+          } else {
+            return done(err, null, {
+              message: 'There was an error logging you in with Facebook'
+            });
+          }
+        });
+
+      // If there is already a user, return it
+      } else {
+        console.log("Logged In Successfully");
+        return done(null, user, {
+          message: 'Logged In Successfully'
+        });
+      }
+    });
+  }
+));
+passport.use(new GoogleStrategy({
+    clientID: '805987247796-g3ajb920lbi3j4r8p54c33ld9fdm0gqs.apps.googleusercontent.com',
+    clientSecret: 'RTRLkiE6E9SccO3xGzjMK3IO',
+    callbackURL: "http://www.selfiesport.in:1337/user/google/callback"
+  },
+  function(accessToken, refreshToken, profile, done) {
+    console.log("profile:",profile);
+       findByGoogleId(profile.id, function (err, user) {
+       console.log("stra:",user);
+      // Create a new User if it doesn't exist yet
+      if (!user) {
+        User.create({
+
+          googleId: profile.id
+
+          // You can also add any other data you are getting back from Facebook here 
+          // as long as it is in your model
+
+        },function (err, user) {console.log("Error:",err);
           if (user) {
             return done(null, user, {
               message: 'Logged In Successfully'

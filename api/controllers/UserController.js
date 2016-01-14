@@ -106,4 +106,25 @@ module.exports = {
     dashboard: function (req, res) {
     res.view();
   },
+  'google':function(req,res,next){
+    passport.authenticate('google',{
+         scope: ['https://www.googleapis.com/auth/plus.login', 'https://www.googleapis.com/auth/plus.profile.emails.read'] 
+    },function(err, user) {
+            console.log("User:", user);
+            req.logIn(user, function(err) {
+                if (err) {
+                    req.session.flash = 'There was an error';
+                    res.redirect('user/login');
+                } else {
+                    req.session.user = user;
+                    res.redirect('/user/dashboard');
+                }
+            });
+    })(req,res,next);
+  },
+  'google/callback': function(req, res, next) {
+        passport.authenticate('google',{ failureRedirect: '/login' }, function(req, res) {
+            res.redirect('/user/dashboard');
+        })(req, res, next);
+    },
 };
